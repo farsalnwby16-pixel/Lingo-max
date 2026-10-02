@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استلام الشهادة - LINGOMAX ACADEMY</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0b0f19; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card-custom { background-color: #111827; border: 1px solid #1f2937; border-radius: 12px; }
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center min-vh-100 py-4">
+
+<div class="container" style="max-width: 550px;">
+    <div class="card card-custom p-4 text-center shadow-lg">
+        <i class="fa-solid fa-trophy fa-4x text-warning mb-3"></i>
+        <h2 class="text-warning fw-bold mb-2">تهانينا! لقد أكملت الكورس بنجاح 🎉</h2>
+        <p class="text-light mb-4">يرجى إدخال اسمك الكامل باللغة العربية أو الإنجليزية كما ترغب أن يظهر في الشهادة الرسمية. **تنبيه: يمكنك كتابة الاسم مرة واحدة فقط ولا يمكن تعديله لاحقاً.**</p>
+
+        <form action="{{ url_for('claim_certificate') }}" method="POST">
+            <div class="mb-4 text-start">
+                <label class="form-label text-warning fw-bold">اسم الطالب الثلاثي أو الرباعي:</label>
+                <input type="text" name="student_name" class="form-control form-control-lg bg-dark text-light border-secondary" placeholder="مثال: فارس النوبي محمد" value="{{ user.student_name or '' }}" required>
+            </div>
+            <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold"><i class="fa-solid fa-file-signature me-2"></i> إصدار الشهادة وحفظ الاسم</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

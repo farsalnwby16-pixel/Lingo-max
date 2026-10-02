@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الإدارة - LINGOMAX</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        body { background: #0b111e; color: #f8fafc; margin: 0; padding: 0; min-height: 100vh; }
+        
+        .header { background: #111827; border-bottom: 1px solid #1f2937; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .brand { font-size: 18px; font-weight: 800; color: #f59e0b; }
+        .toggle-btn { background: #1f2937; color: #fff; border: 1px solid #374151; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); display: none; z-index: 998; }
+        .sidebar-overlay.active { display: block; }
+
+        .sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: #0f172a; border-left: 1px solid #1e293b; z-index: 999; transition: right 0.3s ease; padding: 20px; overflow-y: auto; }
+        .sidebar.active { right: 0; }
+        
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 12px; }
+        .sidebar-header h3 { margin: 0; color: #f59e0b; font-size: 18px; }
+        .close-btn { background: transparent; color: #94a3b8; border: none; font-size: 22px; cursor: pointer; }
+
+        .section-title { color: #64748b; font-size: 12px; font-weight: bold; margin: 16px 0 8px 0; text-transform: uppercase; }
+        
+        .nav-menu { display: flex; flex-direction: column; gap: 6px; }
+        .nav-item { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; text-align: right; }
+        .nav-item:hover { background: #334155; }
+        
+        .cat-group { background: #111827; border: 1px solid #1e293b; border-radius: 8px; padding: 8px; margin-bottom: 8px; }
+        .cat-name { color: #f59e0b; font-weight: bold; font-size: 14px; margin-bottom: 6px; }
+        .lvl-btns { display: flex; flex-wrap: wrap; gap: 4px; }
+        .lvl-btn { background: #1e293b; color: #38bdf8; border: 1px solid #0284c7; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
+
+        .main-content { padding: 20px 16px; max-width: 900px; margin: 0 auto; }
+        
+        .empty-state { text-align: center; padding: 60px 20px; color: #64748b; }
+
+        .card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 18px; display: none; }
+        .card.active { display: block; }
+        .card-title { color: #f59e0b; margin-top: 0; margin-bottom: 16px; font-size: 17px; border-bottom: 1px solid #1f2937; padding-bottom: 8px; }
+
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 8px; font-size: 14px; outline: none; }
+
+        .submit-btn { background: #f59e0b; color: #000; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+
+        .student-item { background: #1e293b; border: 1px solid #334155; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .student-name { font-weight: bold; color: #f8fafc; }
+
+        .lesson-card { background: #1e293b; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .action-btns { display: flex; align-items: center; gap: 4px; }
+        .icon-btn { background: #334155; color: #fff; border: none; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .edit-btn { background: #3b82f6; }
+        .del-btn { background: #ef4444; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="brand">LINGOMAX - Admin</div>
+        <button class="toggle-btn" onclick="toggleSidebar()">
+            <span>☰</span> القائمة الجانبية
+        </button>
+    </div>
+
+    <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>⚙️ لوحة التحكم</h3>
+            <button class="close-btn" onclick="toggleSidebar()">✕</button>
+        </div>
+
+        <div class="section-title">إدارة الطلاب والشهادات</div>
+        <div class="nav-menu">
+            <div class="nav-item" onclick="openSection('students-card')">👥 حسابات الطلاب</div>
+            <div class="nav-item" onclick="openSection('cert-issue-card')">🎓 إصدار شهادة جديدة</div>
+            <a href="/admin/cert_preview" target="_blank" style="text-decoration:none;"><div class="nav-item" style="color:#f59e0b;">👁️ معاينة قالب الشهادة</div></a>
+        </div>
+
+        <div class="section-title">إضافة محتوى</div>
+        <div class="nav-menu">
+            <div class="nav-item" onclick="openSection('single-card')">➕ إضافة درس فردي</div>
+            <div class="nav-item" onclick="openSection('playlist-card')">📑 إضافة قائمة تشغيل</div>
+        </div>
+
+        <div class="section-title">إدارة الدروس والمستويات</div>
+        {% for cat in categories %}
+        <div class="cat-group">
+            <div class="cat-name">📁 {{ cat }}</div>
+            <div class="lvl-btns">
+                {% for lvl in levels %}
+                <button class="lvl-btn" onclick="openFilterSection('{{ cat }}', '{{ lvl }}')">{{ lvl }}</button>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="main-content">
+        
+        <div class="empty-state" id="empty-state">
+            <div style="font-size: 40px; margin-bottom: 10px;">📋</div>
+            <h3 style="color: #cbd5e1; margin: 0 0 8px 0;">مرحباً بك في لوحة الإدارة</h3>
+            <p>اختر خياراً من القائمة الجانبية للتعديل والإدارة.</p>
+        </div>
+
+        <div class="card" id="students-card">
+            <h3 class="card-title">👥 إدارة حسابات الطلاب المسجلين</h3>
+            {% for student in students %}
+            <div class="student-item">
+                <div>
+                    <div class="student-name">{{ student['name'] }}</div>
+                </div>
+                <div class="action-btns">
+                    <form action="/delete_student/{{ student['id'] }}" method="POST" style="margin:0;" onsubmit="return confirm('حذف الحساب نهائياً؟')">
+                        <button class="icon-btn del-btn">🗑️ حذف</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p style="color: #64748b; text-align: center;">لا يوجد طلاب مسجلون.</p>
+            {% endfor %}
+        </div>
+
+        <div class="card" id="cert-issue-card">
+            <h3 class="card-title">🎓 إصدار شهادة برقم فريد جديد</h3>
+            <form action="/issue_cert" method="POST">
+                <div class="form-group">
+                    <label>اسم الطالب الثلاثي:</label>
+                    <input type="text" name="student_name" required placeholder="مثال: أحمد محمد علي">
+                </div>
+                <button type="submit" class="submit-btn">إصدار الشهادة فوراً</button>
+            </form>
+
+            <h4 style="color:#cbd5e1; margin-top:20px;">الشهادات الصادرة سابقاً:</h4>
+            {% for cert in certificates %}
+            <div class="student-item">
+                <div>
+                    <div class="student-name">{{ cert['student_name'] }}</div>
+                    <div style="font-size:11px; color:#f59e0b;">ID: {{ cert['cert_id'] }}</div>
+                </div>
+                <a href="/certificate/{{ cert['cert_id'] }}" target="_blank" style="text-decoration:none;">
+                    <button class="icon-btn edit-btn">📜 عرض الشهادة</button>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="card" id="single-card">
+            <h3 class="card-title">➕ إضافة درس فردي</h3>
+            <form action="/add_single" method="POST">
+                <div class="form-group">
+                    <label>عنوان الدرس:</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>القسم:</label>
+                    <select name="category" required>
+                        {% for cat in categories %}<option value="{{ cat }}">{{ cat }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>المستوى:</label>
+                    <select name="level" required>
+                        {% for lvl in levels %}<option value="{{ lvl }}">{{ lvl }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>رابط الفيديو:</label>
+                    <input type="url" name="youtube_url" required>
+                </div>
+                <button type="submit" class="submit-btn">حفظ الدرس</button>
+            </form>
+        </div>
+
+        <div class="card" id="playlist-card">
+            <h3 class="card-title">📑 إضافة قائمة تشغيل</h3>
+            <form action="/add_playlist" method="POST">
+                <div class="form-group">
+                    <label>القسم:</label>
+                    <select name="category" required>
+                        {% for cat in categories %}<option value="{{ cat }}">{{ cat }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>المستوى:</label>
+                    <select name="level" required>
+                        {% for lvl in levels %}<option value="{{ lvl }}">{{ lvl }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>رابط قائمة التشغيل:</label>
+                    <input type="url" name="playlist_url" required>
+                </div>
+                <button type="submit" class="submit-btn" style="background:#10b981; color:#fff;">سحب الدروس</button>
+            </form>
+        </div>
+
+        {% for cat in categories %}
+            {% for lvl in levels %}
+            <div class="card manage-group" id="manage-{{ cat }}-{{ lvl }}">
+                <h3 class="card-title">✏️ إدارة دروس {{ cat }} - {{ lvl }}</h3>
+                {% for lesson in lessons %}
+                    {% if lesson['category'] == cat and lesson['level'] == lvl %}
+                    <div class="lesson-card">
+                        <div style="font-size:13px;">{{ lesson['title'] }}</div>
+                        <div class="action-btns">
+                            <form action="/reorder_lesson/{{ lesson['id'] }}/up" method="POST" style="margin:0;"><button class="icon-btn">▲</button></form>
+                            <form action="/reorder_lesson/{{ lesson['id'] }}/down" method="POST" style="margin:0;"><button class="icon-btn">▼</button></form>
+                            <form action="/delete_lesson/{{ lesson['id'] }}" method="POST" style="margin:0;" onsubmit="return confirm('حذف؟')"><button class="icon-btn del-btn">🗑️</button></form>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endfor %}
+        {% endfor %}
+
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function openSection(sectionId) {
+            document.getElementById('empty-state').style.display = 'none';
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            toggleSidebar();
+        }
+
+        function openFilterSection(cat, lvl) {
+            document.getElementById('empty-state').style.display = 'none';
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            const targetCard = document.getElementById('manage-' + cat + '-' + lvl);
+            if (targetCard) targetCard.classList.add('active');
+            toggleSidebar();
+        }
+    </script>
+</body>
+</html>

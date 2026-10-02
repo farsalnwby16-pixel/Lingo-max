@@ -1,0 +1,80 @@
+<!-- عنوان القائمة الجانبية -->
+<div class="d-flex justify-content-between align-items-center mb-3 px-1">
+    <h5 class="text-warning fw-bold m-0"><i class="fa-solid fa-list-ul me-2"></i> قائمة الأقسام والدروس</h5>
+</div>
+
+<!-- الشجرة الجانبية -->
+<div class="accordion mb-4" id="sidebarSectionsAccordion">
+    {% for sec in SECTIONS %}
+        {% set sec_loop_idx = loop.index %}
+        <div class="accordion-item bg-transparent border-0 mb-2">
+            <!-- زر القسم الرئيسي -->
+            <h2 class="accordion-header" id="heading-sec-{{ sec_loop_idx }}">
+                <button class="accordion-button collapsed custom-sec-btn shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-sec-{{ sec_loop_idx }}">
+                    <div class="d-flex justify-content-between align-items-center w-100 pe-2">
+                        <span class="fw-bold fs-6">{{ sec }}</span>
+                        <i class="fa-solid fa-folder text-warning fs-5"></i>
+                    </div>
+                </button>
+            </h2>
+
+            <!-- محتوى المستويات -->
+            <div id="collapse-sec-{{ sec_loop_idx }}" class="accordion-collapse collapse" data-bs-parent="#sidebarSectionsAccordion">
+                <div class="accordion-body p-2 pt-3">
+                    <div class="accordion" id="accordionLevels-{{ sec_loop_idx }}">
+                        {% for lvl in LEVELS %}
+                            {% set lvl_loop_idx = loop.index %}
+                            {% set lvl_lessons = lessons_tree.get(sec, {}).get(lvl, []) %}
+                            
+                            <div class="accordion-item bg-transparent border-0 mb-2">
+                                <!-- زر المستوى -->
+                                <h2 class="accordion-header" id="heading-lvl-{{ sec_loop_idx }}-{{ lvl_loop_idx }}">
+                                    <button class="accordion-button collapsed custom-lvl-btn shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-lvl-{{ sec_loop_idx }}-{{ lvl_loop_idx }}">
+                                        <div class="d-flex justify-content-between align-items-center w-100 pe-2">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="fa-solid fa-layer-group text-info"></i>
+                                                <span class="fw-bold text-light">المستوى {{ lvl }}</span>
+                                            </div>
+                                            <span class="badge bg-secondary rounded-pill px-2 py-1">{{ lvl_lessons|length }}</span>
+                                        </div>
+                                    </button>
+                                </h2>
+
+                                <!-- قائمة الدروس بالاسم الكامل والترتيب -->
+                                <div id="collapse-lvl-{{ sec_loop_idx }}-{{ lvl_loop_idx }}" class="accordion-collapse collapse" data-bs-parent="#accordionLevels-{{ sec_loop_idx }}">
+                                    <div class="accordion-body p-1 pt-2">
+                                        {% if lvl_lessons %}
+                                            {% for lesson in lvl_lessons %}
+                                                <a href="{{ url_for('index', lesson_id=lesson.id) }}" 
+                                                   class="custom-lesson-item d-flex justify-content-between align-items-start text-decoration-none my-1 p-2 rounded-3 {% if active_lesson and active_lesson.id == lesson.id %}active-lesson-btn{% endif %}">
+                                                    <div class="d-flex align-items-start gap-2 pe-1">
+                                                        <i class="fa-solid fa-circle-play mt-1"></i>
+                                                        <span class="fw-semibold lesson-text-full">الدرس {{ loop.index }}: {{ lesson.title }}</span>
+                                                    </div>
+                                                    {% if lesson.id in completed_ids %}
+                                                        <i class="fa-solid fa-circle-check text-success fs-6 mt-1 ms-1"></i>
+                                                    {% endif %}
+                                                </a>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="text-muted small p-2 text-center">لا توجد دروس مضافة لهذا المستوى.</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- قفل الشهادة في أسفل القائمة الجانبية فقط -->
+<div class="card card-custom p-3 border-secondary">
+    {% if progress_percentage == 100 %}
+        <a href="{{ url_for('claim_certificate') }}" class="btn btn-success fw-bold w-100 py-2"><i class="fa-solid fa-award me-1"></i> استلام الشهادة الآن!</a>
+    {% else %}
+        <button class="btn btn-secondary fw-bold w-100 py-2" disabled><i class="fa-solid fa-lock me-1"></i> الشهادة مقفلة (أكمل 100%)</button>
+    {% endif %}
+</div>

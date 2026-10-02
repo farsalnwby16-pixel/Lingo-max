@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ lesson.title }}</title><script src="https://cdn.tailwindcss.com"></script>
+<style>
+    .lessons-container, .playlist-container, .lessons-list, .scrollable-lessons {
+        scroll-behavior: smooth;
+    }
+    .lessons-container::-webkit-scrollbar, .playlist-container::-webkit-scrollbar, .lessons-list::-webkit-scrollbar, .scrollable-lessons::-webkit-scrollbar {
+        width: 6px;
+    }
+    .lessons-container::-webkit-scrollbar-thumb, .playlist-container::-webkit-scrollbar-thumb, .lessons-list::-webkit-scrollbar-thumb, .scrollable-lessons::-webkit-scrollbar-thumb {
+        background: #f59e0b;
+        border-radius: 4px;
+    }
+</style>
+
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-6">
+    <div class="max-w-3xl mx-auto">
+        <a href="/" class="text-yellow-400 hover:underline mb-4 inline-block font-bold">&larr; العودة للرئيسية</a>
+        <h1 class="text-2xl font-bold mb-4 text-yellow-400">{{ lesson.title }}</h1>
+        <div class="relative w-full overflow-hidden rounded-2xl shadow-2xl mb-6 border border-gray-700" style="padding-top: 56.25%;">
+            <iframe src="{{ embed_url }}" class="absolute top-0 left-0 w-full h-full" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <form action="/toggle_lesson/{{ lesson.id }}" method="POST">
+            <button type="submit" class="w-full py-3.5 rounded-xl font-extrabold text-gray-950 shadow-lg transition {{ 'bg-green-500 hover:bg-green-600' if is_completed else 'bg-yellow-500 hover:bg-yellow-600' }}">
+                {{ 'إلغاء الإكمال' if is_completed else 'تم إنهاء الدرس (وضع علامة مكتمل ✅)' }}
+            </button>
+        </form>
+    </div>
+</body>
+</html>

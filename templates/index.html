@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINGOMAX ACADEMY - المنصة التعليمية</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0d1322; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { background-color: #111827; border-left: 1px solid #1f2937; min-height: calc(100vh - 70px); }
+        .card-custom { background-color: #172033; border: 1px solid #243049; border-radius: 12px; }
+        
+        .custom-sec-btn {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
+            border: 1px solid #334155 !important;
+            border-radius: 10px !important;
+            padding: 14px 16px;
+        }
+        .custom-sec-btn:not(.collapsed) {
+            background-color: #27354a !important;
+            color: #f59e0b !important;
+            border-color: #f59e0b !important;
+        }
+
+        .custom-lvl-btn {
+            background-color: #172033 !important;
+            color: #e2e8f0 !important;
+            border: 1px solid #2a3854 !important;
+            border-radius: 8px !important;
+            padding: 10px 14px;
+        }
+
+        .custom-lesson-item {
+            background-color: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid #2d3d57;
+            transition: all 0.2s ease-in-out;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        .custom-lesson-item:hover {
+            background-color: #2a3a54;
+            color: #ffffff;
+        }
+        
+        .active-lesson-btn {
+            background-color: #f59e0b !important;
+            color: #0d1322 !important;
+            font-weight: bold !important;
+            border-color: #fbbf24 !important;
+        }
+
+        .lesson-text-full {
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        .ratio-16x9 iframe { border-radius: 12px; }
+        .offcanvas-custom { background-color: #111827; color: #e2e8f0; width: 340px; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary p-3">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold text-warning" href="{{ url_for('index') }}">
+            <i class="fa-solid fa-graduation-cap me-2"></i> LINGOMAX ACADEMY
+        </a>
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-warning d-md-none btn-sm fw-bold" type="button" data-bs-toggle="offcanvas" data-bs-target="#studentSidebar">
+                <i class="fa-solid fa-bars me-1"></i> الدروس
+            </button>
+            {% if current_user %}
+                <span class="text-light fw-bold d-none d-sm-inline"><i class="fa-solid fa-user me-1 text-warning"></i> {{ current_user.username }}</span>
+                {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-warning fw-bold"><i class="fa-solid fa-gear me-1"></i> الأدمن</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-right-from-bracket me-1"></i> خروج</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- القائمة الجانبية -->
+        <div class="col-md-4 col-lg-3 sidebar p-3 d-none d-md-block">
+            {% include 'sidebar_content.html' %}
+        </div>
+
+        <!-- المنطقة الرئيسية -->
+        <div class="col-md-8 col-lg-9 p-3 p-md-4">
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- شريط تقدم الدورة (المستوى والمعدل المئوي فوق الفيديو مباشرة) -->
+            <div class="card card-custom p-3 mb-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold text-warning fs-6"><i class="fa-solid fa-chart-line me-2"></i> نسبة إنجازك بالدورة</span>
+                    <span class="badge bg-warning text-dark fw-bold fs-6">{{ progress_percentage }}%</span>
+                </div>
+                <div class="progress bg-dark mb-2" style="height: 12px; border-radius: 6px;">
+                    <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ progress_percentage }}%;"></div>
+                </div>
+                <div class="text-muted small">
+                    أكملت <strong>{{ completed_count }}</strong> من أصل <strong>{{ total_courses }}</strong> درس
+                </div>
+            </div>
+
+            <!-- مشغل الفيديو والدرس النشط -->
+            {% if active_lesson %}
+                <div class="card card-custom p-3 p-md-4 shadow-sm mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="text-warning fw-bold m-0">{{ active_lesson.title }}</h4>
+                        <span class="badge bg-info text-dark fw-bold">{{ active_lesson.section }} - {{ active_lesson.level }}</span>
+                    </div>
+
+                    <div class="ratio ratio-16x9 mb-4">
+                        <iframe src="{{ active_lesson.embed_url }}" title="{{ active_lesson.title }}" allowfullscreen></iframe>
+                    </div>
+
+                    {% if active_lesson.text_content %}
+                        <div class="p-3 bg-dark rounded border border-secondary mb-4">
+                            <h6 class="text-warning fw-bold"><i class="fa-solid fa-file-text me-1"></i> الشرح والملخص:</h6>
+                            <p class="m-0 text-light" style="white-space: pre-line;">{{ active_lesson.text_content }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-end">
+                        {% if active_lesson.id in completed_ids %}
+                            <button class="btn btn-success fw-bold px-4" disabled><i class="fa-solid fa-check-double me-1"></i> تم إكمال هذا الدرس</button>
+                        {% else %}
+                            <form action="{{ url_for('mark_complete', course_id=active_lesson.id) }}" method="POST">
+                                <button type="submit" class="btn btn-warning fw-bold px-4"><i class="fa-solid fa-check me-1"></i> تحديد كـ مكتمل</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="card card-custom p-4 p-md-5 text-center shadow-sm my-3 my-md-5">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-circle-play text-warning display-1"></i>
+                    </div>
+                    <h3 class="text-warning fw-bold mb-3">مرحباً بك في LINGOMAX ACADEMY!</h3>
+                    <p class="text-muted fs-6 mb-0">افتح القائمة الجانبية واختر الدرس للبدء في المشاهدة.</p>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<!-- القائمة السحابية للموبايل -->
+<div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="studentSidebar">
+    <div class="offcanvas-header border-bottom border-secondary">
+        <h5 class="offcanvas-title text-warning fw-bold"><i class="fa-solid fa-list-ul me-2"></i> المحتوى الدراسي</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-3">
+        {% include 'sidebar_content.html' %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

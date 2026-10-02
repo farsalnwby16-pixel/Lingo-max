@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التحقق من صحة الشهادة - LINGOMAX</title>
+    <style>
+        body { background-color: #0b111e; color: #fff; font-family: system-ui, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; }
+        .card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 25px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .badge-success { background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; display: inline-block; font-weight: bold; margin-bottom: 15px; }
+        .badge-danger { background: #ef4444; color: white; padding: 8px 16px; border-radius: 20px; display: inline-block; font-weight: bold; margin-bottom: 15px; }
+        .info-group { text-align: right; margin-top: 20px; border-top: 1px solid #1f2937; padding-top: 15px; }
+        .info-label { color: #94a3b8; font-size: 12px; margin-bottom: 2px; }
+        .info-val { color: #f8fafc; font-size: 15px; font-weight: bold; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    {% if status == 'valid' %}
+        <div class="badge-success">✓ شهادة موثقة ورسمية</div>
+        <h2 style="color: #f59e0b; margin: 0 0 10px 0;">LINGOMAX ACADEMY</h2>
+        <p style="color: #94a3b8; font-size: 13px;">تم إصدار هذه الشهادة رسمياً من منصة LINGOMAX وهي مسجلة بسجلاتنا.</p>
+
+        <div class="info-group">
+            <div class="info-label">اسم الطالب:</div>
+            <div class="info-val">{{ cert['student_name'] }}</div>
+
+            <div class="info-label">البرنامج التدريبي:</div>
+            <div class="info-val">{{ cert['course_name'] }}</div>
+
+            <div class="info-label">تاريخ الإصدار:</div>
+            <div class="info-val">{{ cert['issue_date'] }}</div>
+
+            <div class="info-label">الرقم التعريفي الفريد:</div>
+            <div class="info-val" style="font-family: monospace; color: #f59e0b;">{{ cert['cert_id'] }}</div>
+        </div>
+    {% else %}
+        <div class="badge-danger">✕ شهادة غير صالحة أو مزورة</div>
+        <h2 style="color: #ef4444; margin: 0 0 10px 0;">تحذير من التزوير</h2>
+        <p style="color: #cbd5e1; font-size: 13px;">
+            الرقم التعريفي ({{ cert_id }}) غير موجود بسجلات أكاديمية LINGOMAX. هذه الشهادة غير صالحة ولم تصدر منا.
+        </p>
+    {% endif %}
+</div>
+
+</body>
+</html>

@@ -2,3 +2,7 @@ Flask
 yt-dlp
 qrcode
 pillow
+
+Flask
+gunicorn
+

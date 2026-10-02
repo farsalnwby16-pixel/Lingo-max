@@ -56,6 +56,14 @@
         .edit-btn { background: #3b82f6; }
         .del-btn { background: #ef4444; }
     </style>
+
+<link rel="manifest" href="/static/manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/sw.js');
+  }
+</script>
+
 </head>
 <body>
 

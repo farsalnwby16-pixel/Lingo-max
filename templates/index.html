@@ -60,6 +60,14 @@
         .ratio-16x9 iframe { border-radius: 12px; }
         .offcanvas-custom { background-color: #111827; color: #e2e8f0; width: 340px; }
     </style>
+
+<link rel="manifest" href="/static/manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/sw.js');
+  }
+</script>
+
 </head>
 <body>
 

@@ -13,6 +13,14 @@
         .info-label { color: #94a3b8; font-size: 12px; margin-bottom: 2px; }
         .info-val { color: #f8fafc; font-size: 15px; font-weight: bold; margin-bottom: 12px; }
     </style>
+
+<link rel="manifest" href="/static/manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/sw.js');
+  }
+</script>
+
 </head>
 <body>
 

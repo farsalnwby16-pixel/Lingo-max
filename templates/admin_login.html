@@ -9,6 +9,14 @@
         body { background-color: #121212; color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         .login-card { background-color: #1e1e1e; border: 1px solid #333; border-radius: 12px; padding: 2rem; width: 100%; max-width: 400px; }
     </style>
+
+<link rel="manifest" href="/static/manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/sw.js');
+  }
+</script>
+
 </head>
 <body>
 <div class="login-card shadow-lg">

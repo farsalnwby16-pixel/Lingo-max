@@ -1,6 +1,11 @@
 {
   "short_name": "LINGOMAX",
   "name": "LINGOMAX - منصة الفارس التعليمية",
+  "description": "منصتك الاحترافية لتعلم اللغة الإنجليزية",
+  "start_url": "/",
+  "background_color": "#121212",
+  "theme_color": "#4f46e5",
+  "display": "standalone",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
@@ -12,9 +17,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "start_url": "/",
-  "background_color": "#121212",
-  "theme_color": "#4f46e5",
-  "display": "standalone"
+  ]
 }

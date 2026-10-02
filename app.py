@@ -1,6 +1,9 @@
+import os, shutil
+if os.environ.get('VERCEL') and os.path.exists('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db') and not os.path.exists('/tmp/database.db'):
+    shutil.copyfile('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db', '/tmp/database.db')
 import os
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database.db')
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH, timeout=20)
@@ -38,7 +41,7 @@ def generate_qr_code(data):
 
 # إنشاء وتنظيم قاعدة البيانات الدائمة (SQLite)
 def init_db():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
     cursor = conn.cursor()
     
     # جدول الدروس
@@ -135,7 +138,7 @@ def login():
             # لو الإيميل مش مكتوب نعمل إيميل أوتوماتيكي فريد
             user_email = email if email else f"{uuid.uuid4().hex[:8]}@lingomax.local"
 
-            conn = sqlite3.connect('database.db')
+            conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
             cursor = conn.cursor()
 
             # فحص وجود الحساب
@@ -166,7 +169,7 @@ def login():
             login_input = request.form.get('login_input', '').strip()
             password = request.form.get('password', '')
 
-            conn = sqlite3.connect('database.db')
+            conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
 
@@ -204,7 +207,7 @@ def index():
 @app.route('/student')
 @login_required
 def student():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM lessons ORDER BY sort_order ASC, id ASC')
@@ -215,7 +218,7 @@ def student():
 @app.route('/admin')
 @admin_required
 def admin():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     
@@ -237,7 +240,7 @@ def issue_cert():
     student_name = request.form.get('student_name')
     if student_name:
         cert_id = f"LMX-{str(uuid.uuid4())[:8].upper()}"
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
         cursor = conn.cursor()
         cursor.execute('INSERT INTO certificates (cert_id, student_name) VALUES (?, ?)', (cert_id, student_name))
         conn.commit()
@@ -247,7 +250,7 @@ def issue_cert():
 
 @app.route('/certificate/<cert_id>')
 def view_certificate(cert_id):
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM certificates WHERE cert_id = ?', (cert_id,))
@@ -276,7 +279,7 @@ def cert_preview():
 
 @app.route('/verify/<cert_id>')
 def verify_certificate(cert_id):
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM certificates WHERE cert_id = ?', (cert_id,))
@@ -297,7 +300,7 @@ def add_single():
     youtube_url = request.form.get('youtube_url')
 
     if title and category and level and youtube_url:
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
         cursor = conn.cursor()
         cursor.execute('SELECT MAX(sort_order) FROM lessons WHERE category=? AND level=?', (category, level))
         max_order = cursor.fetchone()[0]
@@ -323,7 +326,7 @@ def add_playlist():
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(playlist_url, download=False)
                 if 'entries' in info:
-                    conn = sqlite3.connect('database.db')
+                    conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
                     cursor = conn.cursor()
                     cursor.execute('SELECT MAX(sort_order) FROM lessons WHERE category=? AND level=?', (category, level))
                     max_order = cursor.fetchone()[0]
@@ -353,7 +356,7 @@ def edit_lesson(lesson_id):
     category = request.form.get('category')
     level = request.form.get('level')
 
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
     cursor = conn.cursor()
     cursor.execute('UPDATE lessons SET title=?, youtube_url=?, category=?, level=? WHERE id=?',
                    (title, youtube_url, category, level, lesson_id))
@@ -364,7 +367,7 @@ def edit_lesson(lesson_id):
 @app.route('/delete_lesson/<int:lesson_id>', methods=['POST'])
 @admin_required
 def delete_lesson(lesson_id):
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
     cursor = conn.cursor()
     cursor.execute('DELETE FROM lessons WHERE id = ?', (lesson_id,))
     conn.commit()
@@ -374,7 +377,7 @@ def delete_lesson(lesson_id):
 @app.route('/reorder_lesson/<int:lesson_id>/<direction>', methods=['POST'])
 @admin_required
 def reorder_lesson(lesson_id, direction):
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     
@@ -405,7 +408,7 @@ def reorder_lesson(lesson_id, direction):
 @app.route('/delete_student/<int:student_id>', methods=['POST'])
 @admin_required
 def delete_student(student_id):
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect('/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
     cursor = conn.cursor()
     cursor.execute('DELETE FROM students WHERE id = ?', (student_id,))
     conn.commit()
@@ -465,7 +468,7 @@ def telegram_webhook():
                 section = line
 
         if yt_url:
-            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database.db')
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '/tmp/database.db' if os.environ.get('VERCEL') else 'database.db')
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
             cursor.execute(

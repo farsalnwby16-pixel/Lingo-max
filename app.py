@@ -11,7 +11,7 @@ def get_db_connection():
     conn.execute('PRAGMA journal_mode=WAL;')
     return conn
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import send_from_directory, Flask, render_template, request, redirect, url_for, session, flash
 from functools import wraps
 import sqlite3
 import yt_dlp
@@ -449,7 +449,7 @@ def import_playlist():
         return f"خطأ في السحب: {str(e)}", 500
 
 import sqlite3
-from flask import request
+from flask import send_from_directory, request
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -479,3 +479,12 @@ def telegram_webhook():
             conn.close()
             print(f"تم سحب الدروس بنجاح: المستوى [{level}] وقسم [{section}]")
     return {'status': 'ok'}
+
+
+@app.route('/manifest.json')
+def serve_manifest():
+    return send_from_directory('static', 'manifest.json')
+
+@app.route('/sw.js')
+def serve_sw():
+    return send_from_directory('static', 'sw.js')
